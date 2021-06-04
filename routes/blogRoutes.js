@@ -15,26 +15,7 @@ module.exports = app => {
 
   // all Redis-instance logic inside route handler
   app.get('/api/blogs', requireLogin, async (req, res) => {
-    const redis = require('redis');
-    const redisUrl = 'redis://127.0.0.1:6379'
-    const client = redis.createClient(redisUrl);
-
-    const util = require('util'); // util fxns from Node native lib -- promisify
-    client.get = util.promisify(client.get);
-
-    const cachedBlogs = await client.get(req.user.id)
-
-    // if existing query exists in Redis cache, immediately sends back cached data & returns
-    if (cachedBlogs) {  // Data pulled out from Redis is JSON!
-      console.log('Serving from Cache! Not touching MongoDB at all.');
-      return res.send(JSON.parse(cachedBlogs)); // backend API sends data back as JSON -- no need to parse before sending
-    }
-
-    // if query was made for 1st time, finds data from MongoDB, sends it as a response, & caches it in Redis
-    // Mongoose Queries like Blog.find( ) will return an array of objects
-    const blogs = await Blog.find({ _user: req.user.id }); // query we're gonna cache
-    client.set(req.user.id, JSON.stringify(blogs)); // JSON.stringify's data before sending to Redis
-    console.log('Serving from MongoDB!');
+    const blogs = await Blog.find({ _user: req.user.id });
     res.send(blogs);
   });
 
