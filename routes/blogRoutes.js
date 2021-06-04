@@ -24,8 +24,17 @@ module.exports = app => {
 
     const cachedBlogs = await client.get(req.user.id)
 
-    const blogs = await Blog.find({ _user: req.user.id }); // query we're gonna cache
+    // if existing query exists in Redis cache, immediately sends back cached data & returns
+    if (cachedBlogs) {  // Data pulled out from Redis is JSON!
+      console.log('Serving from Cache! Not touching MongoDB at all.');
+      return res.send(JSON.parse(cachedBlogs)); // backend API sends data back as JSON -- no need to parse before sending
+    }
 
+    // if query was made for 1st time, finds data from MongoDB, sends it as a response, & caches it in Redis
+    // Mongoose Queries like Blog.find( ) will return an array of objects
+    const blogs = await Blog.find({ _user: req.user.id }); // query we're gonna cache
+    client.set(req.user.id, JSON.stringify(blogs)); // JSON.stringify's data before sending to Redis
+    console.log('Serving from MongoDB!');
     res.send(blogs);
   });
 
