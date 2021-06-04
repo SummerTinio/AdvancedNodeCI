@@ -13,8 +13,18 @@ module.exports = app => {
     res.send(blog);
   });
 
+  // all Redis-instance logic inside route handler
   app.get('/api/blogs', requireLogin, async (req, res) => {
-    const blogs = await Blog.find({ _user: req.user.id });
+    const redis = require('redis');
+    const redisUrl = 'redis://127.0.0.1:6379'
+    const client = redis.createClient(redisUrl);
+
+    const util = require('util'); // util fxns from Node native lib -- promisify
+    client.get = util.promisify(client.get);
+
+    const cachedBlogs = await client.get(req.user.id)
+
+    const blogs = await Blog.find({ _user: req.user.id }); // query we're gonna cache
 
     res.send(blogs);
   });
