@@ -33,7 +33,7 @@ mongoose.Query.prototype.exec = async function () {
     // check if value for that key exists in Redis 
     const existingCacheValue = await client.hget(this.topLevelCacheKey, cacheKey); //sets cacheKeyOptions.key (or '') as top-level hash key
 
-    let docToReturnLater;
+   
     if (existingCacheValue) {
         console.log('yes, existing Cache exists.');
         console.log('CAME FROM REDIS BISH');
@@ -43,19 +43,28 @@ mongoose.Query.prototype.exec = async function () {
 
         // checks if Redis data came in an array or obj
         // returns the appropriate document, for proper hydration of [] or {}
-        docToReturnLater = Array.isArray(doc) 
+        const docToReturnLater = Array.isArray(doc) 
         ? doc.map(obj => new this.model(obj)) 
         : this.model(doc);
+
+        return docToReturnLater;
     }
 
     // if not yet cached, gets that value from MongoDB
     const freshNewCacheValue = await exec.apply(this, arguments);
-    if (existingCacheValue === freshNewCacheValue) {
-        return docToReturnLater;
-    }
+    // if (existingCacheValue === freshNewCacheValue) {
+    //     return docToReturnLater;
+    // }
     // caches that value (document) in Redis
     console.log('newly cached value is', JSON.stringify(freshNewCacheValue));
     client.hset(this.topLevelCacheKey, cacheKey, JSON.stringify(freshNewCacheValue));
     // returns the already-cached document
     return freshNewCacheValue;
+}
+
+// import this object, then call .clearHash() passing in the cacheOptionsObj.key to clear before retrieving
+module.exports = {
+    clearHash(topLevelHashKey) {
+        client.del(JSON.stringify(topLevelHashKey))
+    }
 }
