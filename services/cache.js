@@ -1,3 +1,5 @@
+// Reusable for other projects
+
 const mongoose = require('mongoose');
 const redis = require('redis');
 const util = require('util');
@@ -53,7 +55,7 @@ mongoose.Query.prototype.exec = async function () {
     }
     // caches that value (document) in Redis
     console.log('newly cached value is', JSON.stringify(freshNewCacheValue));
-    client.hset(this.topLevelCacheKey, cacheKey, JSON.stringify(freshNewCacheValue), 'EX', 10);
+    client.hset(this.topLevelCacheKey, cacheKey, JSON.stringify(freshNewCacheValue));
     // returns the already-cached document
     return freshNewCacheValue;
 }
