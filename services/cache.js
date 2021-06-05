@@ -4,11 +4,13 @@ const util = require('util');
 
 const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
-client.get = util.promisify(client.get); //returns promisified copy of original fxn
+client.hget = util.promisify(client.hget); //returns promisified copy of original fxn
 
-mongoose.Query.prototype.cache = function() {
+// .cache() method  accepts obj as an arg, with property "key"
+mongoose.Query.prototype.cache = function(cacheKeyOptions = {}) {
     // sets useCache property on Query instance to 'true'
     this.useCache = true;
+    this.topLevelCacheKey = JSON.stringify(cacheKeyOptions.key || '')
 
     // to make .cache() a chainable method
     return this;
@@ -27,7 +29,7 @@ mongoose.Query.prototype.exec = async function () {
     // generating new, consistent Cache Key
     const cacheKey = JSON.stringify(Object.assign({}, this.getQuery(), { collection: this.mongooseCollection.name }));
     // check if value for that key exists in Redis 
-    const existingCacheValue = await client.get(cacheKey);
+    const existingCacheValue = await client.hget(this.topLevelCacheKey, cacheKey); //sets cacheKeyOptions.key (or '') as top-level hash key
 
     let docToReturnLater;
     if (existingCacheValue) {
@@ -51,7 +53,7 @@ mongoose.Query.prototype.exec = async function () {
     }
     // caches that value (document) in Redis
     console.log('newly cached value is', JSON.stringify(freshNewCacheValue));
-    client.set(cacheKey, JSON.stringify(freshNewCacheValue), 'EX', 10);
+    client.hset(this.topLevelCacheKey, cacheKey, JSON.stringify(freshNewCacheValue), 'EX', 10);
     // returns the already-cached document
     return freshNewCacheValue;
 }
