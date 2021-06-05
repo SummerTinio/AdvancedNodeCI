@@ -6,36 +6,52 @@ const redisUrl = 'redis://127.0.0.1:6379';
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get); //returns promisified copy of original fxn
 
+mongoose.Query.prototype.cache = function() {
+    // sets useCache property on Query instance to 'true'
+    this.useCache = true;
+
+    // to make .cache() a chainable method
+    return this;
+}
+
 //get reference to existing .exec() fxn from mongoose lib
 const exec = mongoose.Query.prototype.exec;
 //modified .exec fxn
 //don't use () => {} syntax, or else 'this' binding will change
 // 'this' must still refer to an instance of the query object
 mongoose.Query.prototype.exec = async function () {
+    // if useCache property is falsy, retrieve data from MongoDB like normal
+    if (!this.useCache) {
+        return exec.apply(this, arguments);
+    }
     // generating new, consistent Cache Key
     const cacheKey = JSON.stringify(Object.assign({}, this.getQuery(), { collection: this.mongooseCollection.name }));
     // check if value for that key exists in Redis 
     const existingCacheValue = await client.get(cacheKey);
 
+    let docToReturnLater;
     if (existingCacheValue) {
-        console.log('skoom');
-        console.log('inside the if block, this=', this);
+        console.log('yes, existing Cache exists.');
+        console.log('CAME FROM REDIS BISH');
 
          // parsing so V8 understands JSON data we got from Redis
          const doc = JSON.parse(existingCacheValue);
 
         // checks if Redis data came in an array or obj
         // returns the appropriate document, for proper hydration of [] or {}
-        return Array.isArray(doc) 
+        docToReturnLater = Array.isArray(doc) 
         ? doc.map(obj => new this.model(obj)) 
         : this.model(doc);
     }
 
     // if not yet cached, gets that value from MongoDB
     const freshNewCacheValue = await exec.apply(this, arguments);
+    if (existingCacheValue === freshNewCacheValue) {
+        return docToReturnLater;
+    }
     // caches that value (document) in Redis
     console.log('newly cached value is', JSON.stringify(freshNewCacheValue));
-    client.set(cacheKey, JSON.stringify(freshNewCacheValue));
+    client.set(cacheKey, JSON.stringify(freshNewCacheValue), 'EX', 10);
     // returns the already-cached document
     return freshNewCacheValue;
 }
