@@ -16,13 +16,13 @@ class ProxiedPage {
         });
 
         const page = await browser.newPage();
-        const customPage = new CustomPage(page)
+        const proxiedPage = new ProxiedPage(page)
     
         // tells Proxy to look for property on customPage --> page --> browser in that order
-        return new Proxy(customPage, {
+        return new Proxy(proxiedPage, {
             get: function(target, property) {
                 // change order of these fxns in order of priority
-                return customPage[property] || browser[property] || page[property];
+                return proxiedPage[property] || browser[property] || page[property];
             }
         })
     }
