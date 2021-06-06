@@ -42,7 +42,10 @@ class ProxiedPage {
         // creates a new Ssession
         await this.page.setCookie({ name: 'session', value: session });
         await this.page.setCookie({ name: 'session.sig', value: sig });
-        await this.page.goto('localhost:3000');
+        //await this.page.goto('localhost:3000');
+        
+        //remove this line if you want to reuse this ProxiedPage elsewhere
+        await this.page.goto('localhost:3000/blogs');
     
         // gotta .waitFor that anchor tag to  be rendered before asserting!
         await this.page.waitFor('a[href="/auth/logout"]');
