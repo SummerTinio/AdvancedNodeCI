@@ -47,6 +47,11 @@ class ProxiedPage {
         // gotta .waitFor that anchor tag to  be rendered before asserting!
         await this.page.waitFor('a[href="/auth/logout"]');
     }
+
+    //wrapper for page.$eval() call --> proxiedPageInstance.getInnerHTML(selector)
+    async getInnerHTML(selector) {
+        return this.page.$eval(selector, el => el.innerHTML);
+    }
 }
 
 // wraps up everything we need for Puppeteer -- so no need to import puppeteer henceforth
