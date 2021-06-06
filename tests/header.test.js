@@ -23,7 +23,7 @@ it('starts OAuth flow after being clicked', async () => {
     expect(url).toMatch(/accounts\.google\.com/);
 })
 
-it.only('shows logout button when signed in', async () => {
+it('shows logout button when signed in', async () => {
     // MongoDB id for particular user -- req.user.id
     const id = '60ba77090c0eb6521cfb07bc'; 
     
@@ -48,4 +48,11 @@ it.only('shows logout button when signed in', async () => {
     await page.setCookie({ name: 'session', value: sessionString });
     await page.setCookie({ name: 'session.sig', value: sig });
     await page.goto('localhost:3000');
+ 
+    // gotta .waitFor that anchor tag to  be rendered before asserting!
+    await page.waitFor('a[href="/auth/logout"]');
+
+    // get a DOM node, assert
+    const text = await page.$eval('.right a[href="/auth/logout"]', el => el.innerHTML);
+    expect(text).toEqual('Logout');
 })
