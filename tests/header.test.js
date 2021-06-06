@@ -13,13 +13,13 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-    page.close();
+    await page.close();
 })
 
 it('renders header with `Blogster`', async () => {
     // .waitFor that specific DOM element to be rendered completely before asserting
     await page.waitFor('a.brand-logo');
-    const text = await page.$eval('a.brand-logo', el => el.innerHTML);
+    const text = await page.getInnerHTML('a.brand-logo');
     expect(text).toEqual('Blogster');
 })
 
@@ -33,6 +33,6 @@ it('shows logout button when signed in', async () => {
     // login using fake session and session.sig
     await page.login();
     // get a DOM node, assert
-    const text = await page.$eval('.right a[href="/auth/logout"]', el => el.innerHTML);
+    const text = await page.getInnerHTML('.right a[href="/auth/logout"]');
     expect(text).toEqual('Logout');
 })
