@@ -11,7 +11,7 @@ afterEach(async () => {
     await page.close();
 });
 
-describe('When logged in,', async () => {
+describe('When logged in', async () => {
     beforeEach(async () => {
         await page.login();
         await page.waitFor('a.btn-floating');
@@ -78,40 +78,15 @@ describe('When logged in,', async () => {
 describe('When user is NOT logged in', async () => {
     test('the user cannot create blog posts', async () => {
         // to make a POST request from within puppeteer
-        const postResult = await page.evaluate(
-            () => {
-
-                return fetch('/api/blogs', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ title: 'My Not-Logged-In (test) Title', content: 'My Not-Logged-In (test) Content'})
-                // fetch returns a promise, so .then() to capture the resolved value
-                }).then(res => res.json());
-
-            }
-        );
+        const postResult = await page.post('/api/blogs');
 
         // and make an assertion based on res object sent by that POST request
         expect(postResult).toEqual({ error: 'You must log in!' });
     });
 
-    test('the user cannot see list of blog posts', async () => {
+    test('the user cannot GET list of blog posts', async () => {
         //to make a GET request to a protected resource from within puppeteer
-        const getResult = await page.evaluate(
-            () => {
-            return fetch('/api/blogs', {
-                method: 'GET',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json'
-                } //note: GET request can NOT have a body
-            // fetch returns a promise, so .then() to capture the resolved value
-            }).then(res => res.json());
-            }
-        );
+        const getResult = await page.get('/api/blogs');
 
          // and make an assertion based on res object sent by that POST request
          expect(getResult).toEqual({ error: 'You must log in!' });
