@@ -1,3 +1,5 @@
+//to get rid of error .. it worked. amazing.
+Number.prototype._called = {};
 //set time limit for each Jest test
 jest.setTimeout(30000);
 
