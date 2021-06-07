@@ -55,6 +55,42 @@ class ProxiedPage {
     async getInnerHTML(selector) {
         return this.page.$eval(selector, el => el.innerHTML);
     }
+
+    //wrapper for page.evaluate() call --> automate a GET test request
+    get(apiEndpoint) {
+        //must return fxn, so Jest knows we're supposed to await a result from this fxn call
+        //also must set 'this' to refer to an instance of ProxiedPage
+        return this.page.evaluate(
+            () => {
+            return fetch(apiEndpoint, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: 'My Not-Logged-In (test) Title', content: 'My Not-Logged-In (test) Content'})
+            // fetch returns a promise, so .then() to capture the resolved value
+            }).then(res => res.json());
+            }
+        );
+    }
+
+    //wrapper for page.evaluate() call --> automate a POST test request
+    post(apiEndpoint) {
+        return this.page.evaluate(
+            () => {
+            return fetch(apiEndpoint, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                } //note: GET request can NOT have a body
+            // fetch returns a promise, so .then() to capture the resolved value
+            }).then(res => res.json());
+            }
+        );
+    }
+
 }
 
 // wraps up everything we need for Puppeteer -- so no need to import puppeteer henceforth
