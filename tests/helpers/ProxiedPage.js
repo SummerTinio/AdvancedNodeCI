@@ -57,14 +57,14 @@ class ProxiedPage {
     }
 
     //wrapper for page.evaluate() call --> automate a GET test request
-    get(apiEndpoint) {
+    get(apiEndPoint) {
         //must return fxn, so Jest knows we're supposed to await a result from this fxn call
         //also must set 'this' to refer to an instance of ProxiedPage
         return this.page.evaluate(
             //note: the entire callback below gets stringified AS IS
             //reference to apiEndpoint will NOT be evaluated as normal JS
-            (_apiEndpoint) => {
-            return fetch(_apiEndpoint, {
+            (_apiEndPoint) => {
+            return fetch(_apiEndPoint, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
@@ -74,16 +74,16 @@ class ProxiedPage {
             // fetch returns a promise, so .then() to capture the resolved value
             }).then(res => res.json());
             // to allow apiEndpoint to get evaluated BEFORE callback is stringified
-            }, apiEndpoint
+            }, apiEndPoint
         );
     }
 
     //wrapper for page.evaluate() call --> automate a POST test request
-    post(apiEndpoint) {
+    post(apiEndPoint) {
         return this.page.evaluate(
             //_apiEndpoint is totally different variable from apiEndpoint, just with the same value
-            (_apiEndpoint) => {
-            return fetch(_apiEndpoint, {
+            (_apiEndPoint) => {
+            return fetch(_apiEndPoint, {
                 method: 'GET',
                 credentials: 'same-origin',
                 headers: {
@@ -92,7 +92,7 @@ class ProxiedPage {
             // fetch returns a promise, so .then() to capture the resolved value
             }).then(res => res.json());
             // arg to pass into page.evaluate() callback
-            }, apiEndpoint
+            }, apiEndPoint
         );
     }
 
