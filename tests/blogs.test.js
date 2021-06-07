@@ -75,10 +75,10 @@ describe('When logged in,', async () => {
     });
 });
 
-describe('User is not logged in', async () => {
-    test('User cannot create blog posts', async () => {
+describe('When user is NOT logged in', async () => {
+    test('the user cannot create blog posts', async () => {
         // to make a POST request from within puppeteer
-        const fetchedResult = await page.evaluate(
+        const postResult = await page.evaluate(
             () => {
 
                 return fetch('/api/blogs', {
@@ -95,6 +95,27 @@ describe('User is not logged in', async () => {
         );
 
         // and make an assertion based on res object sent by that POST request
-        expect(fetchedResult).toEqual({ error: 'You must log in!' });
+        expect(postResult).toEqual({ error: 'You must log in!' });
     });
+
+    test('the user cannot see list of blog posts', async () => {
+        //to make a GET request to a protected resource from within puppeteer
+        const getResult = await page.evaluate(
+            () => {
+            return fetch('/api/blogs', {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                } //note: GET request can NOT have a body
+            // fetch returns a promise, so .then() to capture the resolved value
+            }).then(res => res.json());
+            }
+        );
+
+         // and make an assertion based on res object sent by that POST request
+         expect(getResult).toEqual({ error: 'You must log in!' });
+    })
+
+
 });
