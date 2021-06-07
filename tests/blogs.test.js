@@ -95,6 +95,6 @@ describe('User is not logged in', async () => {
         );
 
         // and make an assertion based on res object sent by that POST request
-        expect(fetchedResult).toEqual({ error: 'You must login!' });
+        expect(fetchedResult).toEqual({ error: 'You must log in!' });
     });
 });
