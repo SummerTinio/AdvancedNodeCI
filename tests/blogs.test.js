@@ -78,7 +78,7 @@ describe('When logged in', async () => {
 describe('When user is NOT logged in', async () => {
     test('the user cannot create blog posts', async () => {
         // to make a POST request from within puppeteer
-        const postResult = await page.post('/api/blogs');
+        const postResult = await page.post('/api/blogs', { title: 'My Not-Logged-In (test) Title', content: 'My Not-Logged-In (test) Content'});
 
         // and make an assertion based on res object sent by that POST request
         expect(postResult).toEqual({ error: 'You must log in!' });
