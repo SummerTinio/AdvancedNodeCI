@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
 
+//use this to clear Redis cache after creating a new blogpost.
+// const cleanCache = require('../middlewares/cleanCache').cleanCache;
+const { clearHash } = require('../services/cache');
+
 const Blog = mongoose.model('Blog');
 
 module.exports = app => {
@@ -13,7 +17,7 @@ module.exports = app => {
     res.send(blog);
   });
 
-  // all Redis-instance logic inside route handler
+  // all Redis-instance logic inside route handler 
   app.get('/api/blogs', requireLogin, async (req, res) => {
     const blogs = await Blog.find({ _user: req.user.id }).cache({ key: req.user.id });
     res.send(blogs);
@@ -34,5 +38,8 @@ module.exports = app => {
     } catch (err) {
       res.send(400, err);
     }
+    console.log('CLEARING YO HASH!');
+    console.log(req.user.id);
+    clearHash(req.user.id);
   });
 };
