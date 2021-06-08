@@ -96,6 +96,17 @@ class ProxiedPage {
         );
     }
 
+    //expects array of objects in form of: 
+    //[ { method: 'get', apiEndPoint: '/api/blogs', expectedResult: { error: 'You must log in!' } }, { method: 'post', apiEndPoint: '/api/blogs', reqBody: { title: 'T', content: 'C' }, expectedResult: { error: 'You must log in!' } }]
+    execRequests(actionsArr) {
+        //since each iteration returns a promise
+        return Promise.all(actionsArr.map(({ method, apiEndPoint, reqBody }) => {
+            //reference to this.get() or this.post()
+            //Computed Member Access Notation, where [method] is computed
+            return this[method](apiEndPoint, reqBody)
+        }));
+    }
+
 }
 
 // wraps up everything we need for Puppeteer -- so no need to import puppeteer henceforth
