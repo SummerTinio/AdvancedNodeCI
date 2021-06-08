@@ -76,21 +76,15 @@ describe('When logged in', async () => {
 });
 
 describe('When user is NOT logged in', async () => {
-    test('the user cannot create blog posts', async () => {
-        // to make a POST request from within puppeteer
-        const postResult = await page.post('/api/blogs', { title: 'My Not-Logged-In (test) Title', content: 'My Not-Logged-In (test) Content'});
+    const actionsArr = [{ method: 'get', apiEndPoint: '/api/blogs'}, { method: 'post', apiEndPoint: '/api/blogs', reqBody: { title: 'T', content: 'C' } }];
 
-        // and make an assertion based on res object sent by that POST request
-        expect(postResult).toEqual({ error: 'You must log in!' });
-    });
+    test('blog-related actions are prohibited', async () => {
+        // returns array of response objects
+        const allResponses = await page.execRequests(actionsArr);
 
-    test('the user cannot GET list of blog posts', async () => {
-        //to make a GET request to a protected resource from within puppeteer
-        const getResult = await page.get('/api/blogs');
-
-         // and make an assertion based on res object sent by that POST request
-         expect(getResult).toEqual({ error: 'You must log in!' });
+        for (let eachResponse of allResponses) {
+            expect(eachResponse).toEqual({ error: 'You must log in!'})
+        }
+        //allResponses.forEach(oneResponse => expect(oneResponse).toEqual({ error: 'You must log in!'}));
     })
-
-
 });
