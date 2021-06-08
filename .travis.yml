@@ -1,0 +1,30 @@
+# javascript === node_js
+language: node_js 
+# minimum version of node required to run your app
+node_js:
+  - "14"
+#distribution, base image for virtual machine Travis will make for us -- like Ubuntu or Debian
+#small version (VM) of Linux 
+# dist === OS of our virtual machine for Travis
+dist: trusty
+#services === pieces of "outside" software we need to run our app -- e.g. databases, modules
+services:
+  - mongodb
+  - redis-server
+# array of environment variables, w/c we need to run app in VM .. i.e. from ur config/keys
+# env === array of env variables you want set for Travis VM
+env:
+  - NODE_ENV=ci
+# after Travis installs node_modules atleast 1 time, will CACHE it for future builds
+cache:
+  directories:
+    # AdvancedNodeStarter dir's node_modules
+    - node_modules
+    # client dir's node_modules
+    - client/node_modules
+# commands u want Travis to run at command line, e.g. for SETUP
+# install === array of setup command line scripts
+install:
+  - npm install
+  # specific to this project
+  - npm run build
