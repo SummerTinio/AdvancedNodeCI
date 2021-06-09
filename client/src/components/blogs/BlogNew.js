@@ -7,7 +7,11 @@ import BlogFormReview from './BlogFormReview';
 class BlogNew extends Component {
   constructor(props) {
     super(props);
-    this.state = { showFormReview: false }
+    this.state = { showFormReview: false, file: null }
+  }
+
+  onFileChange = (event) => {
+    this.setState({ file: event.target.files[0] });
   }
 
   renderContent() {
@@ -15,6 +19,7 @@ class BlogNew extends Component {
       return (
         <BlogFormReview
           onCancel={() => this.setState({ showFormReview: false })}
+          file={this.state.file}
         />
       );
     }
@@ -29,6 +34,9 @@ class BlogNew extends Component {
   render() {
     return (
       <div>
+        {/*{allows user to click button for File Upload}*/}
+        <h5>Add an Image</h5>
+        <input onChange={this.onFileChange}type="file" accept="image/*" />
         {this.renderContent()}
       </div>
     );
