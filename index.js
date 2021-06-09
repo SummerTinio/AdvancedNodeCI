@@ -27,6 +27,8 @@ app.use(passport.session());
 
 require('./routes/authRoutes')(app);
 require('./routes/blogRoutes')(app);
+// require the function, invoke fxn
+require('./routes/uploadRoutes')(app);
 
 // if our Node envt is either "production" or "ci", run the ff. file-serving middleware
 if (['production', 'ci'].includes(process.env.NODE_ENV)) {
