@@ -28,3 +28,12 @@ install:
   - npm install
   # specific to this project
   - npm run build
+# like install, but runs after inistall
+script:
+  # npm run start === by default / by itself, solely focuses on that command by default. can't run any other commands
+  # nohup === will allow other commands to be executed WHILE npm run start is running
+  # & === run underlying command in a subshell / "in background mode"
+  - nohup npm run start &
+  # give ur server time to execute / run itself
+  - sleep 3
+  - npm run test
