@@ -13,7 +13,7 @@ class ProxiedPage {
     static async build() { // <-- creates method: CustomPage.build()
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox'] // so we don't need to mess around with travis's VM
+            args: ['--no-sandbox'] // so we don't need to mess around with travis's VM settings
         })
 
         const page = await browser.newPage();
