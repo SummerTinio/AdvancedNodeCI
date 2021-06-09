@@ -7,6 +7,10 @@ import { withRouter } from 'react-router-dom';
 import * as actions from '../../actions';
 
 class BlogFormReview extends Component {
+  constructor(props) {
+    super(props);
+  }
+
   renderFields() {
     const { formValues } = this.props;
 
@@ -42,9 +46,9 @@ class BlogFormReview extends Component {
   onSubmit(event) {
     event.preventDefault();
 
-    const { submitBlog, history, formValues } = this.props;
-
-    submitBlog(formValues, history);
+    const { submitBlog, history, formValues, file } = this.props;
+    // submitBlog === a callback
+    submitBlog(formValues, file, history);
   }
 
   render() {
