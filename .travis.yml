@@ -14,7 +14,8 @@ services:
 # array of environment variables, w/c we need to run app in VM .. i.e. from ur config/keys
 # env === array of env variables you want set for Travis VM
 env:
-  - NODE_ENV=ci
+  # note: these have to be combined in 1 line, or else 2 separate builds will be created
+  - NODE_ENV=ci PORT=3000
 # after Travis installs node_modules atleast 1 time, will CACHE it for future builds
 cache:
   directories:
