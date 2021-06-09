@@ -3,9 +3,10 @@
 const mongoose = require('mongoose');
 const redis = require('redis');
 const util = require('util');
+const keys = require('../config/keys');
 
-const redisUrl = 'redis://127.0.0.1:6379';
-const client = redis.createClient(redisUrl);
+// use redisURL defined in config/keys.js to create redis instance
+const client = redis.createClient(keys.redisUrl);
 client.hget = util.promisify(client.hget); //returns promisified copy of original fxn
 
 // .cache() method  accepts obj as an arg, with property "key"
