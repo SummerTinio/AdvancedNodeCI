@@ -34,8 +34,8 @@ describe('When logged in', async () => {
     });
 
     test('submitting takes user to confirmation (review) page', async () => {
-      await page.waitFor('h5');
-      const formText = await page.getInnerHTML('h5');
+      await page.waitFor('form h5');
+      const formText = await page.getInnerHTML('form h5');
       expect(formText).toEqual('Please confirm your entries');
     });
 
