@@ -18,7 +18,8 @@ export const submitBlog = (formValues, history, file) => async dispatch => {
   // issue POST request to backend API to make a blog post
   const res = await axios.post('/api/blogs', formValues);
   // navigate user back to list of blogs
-  history.push('/blogs');
+  // must await, or else page redirects too early
+  await history.push('/blogs');
   // tell Redux side of app about newly-created blog post
   dispatch({ type: FETCH_BLOG, payload: res.data });
 };
