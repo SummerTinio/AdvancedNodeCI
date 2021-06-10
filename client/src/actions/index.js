@@ -13,10 +13,29 @@ export const handleToken = token => async dispatch => {
   dispatch({ type: FETCH_USER, payload: res.data });
 };
 
-// makes a request to AWS API for a presigned url for image upload
-export const submitBlog = (formValues, history, file) => async dispatch => {
+// note: actual request to AWS API for a presigned url for image upload happens on uploadRoutes.js -- not here.
+export const submitBlog = (formValues, history, eventTargetFile) => async dispatch => {
   // issue POST request to backend API to make a blog post
   const res = await axios.post('/api/blogs', formValues);
+
+  // i.e. "only give the user a presigned url if they actually want to upload a file"
+  if (eventTargetFile !== null){
+    // object containing: fileName: '', preSignedUrl: ''
+    const BackendApiResponse = await axios.get('/api/upload'); // aka uploadConfig
+    const AwsPreSignedUrl = BackendApiResponse.data.preSignedUrl; // JSON data === accessible from .data property
+    // BCK, bucket, contentType, key
+    // eventTargetFile comes from ReduxForm .. event.target.files[0]
+    await axios.put(
+      AwsPreSignedUrl, 
+      eventTargetFile,
+      {
+        headers: {
+          'Content-Type': eventTargetFile.type 
+        } 
+      }
+    );
+  }
+
   // navigate user back to list of blogs
   // must await, or else page redirects too early
   await history.push('/blogs');
