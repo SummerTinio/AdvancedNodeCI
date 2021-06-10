@@ -24,9 +24,10 @@ module.exports = app => {
   });
 
   app.post('/api/blogs', requireLogin, async (req, res) => {
-    const { title, content } = req.body;
+    const { title, content, fileName } = req.body;
 
     const blog = new Blog({
+      fileName, // reminder: Mongoose Model must also be aware of this new property
       title,
       content,
       _user: req.user.id
