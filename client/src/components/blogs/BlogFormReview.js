@@ -48,7 +48,7 @@ class BlogFormReview extends Component {
 
     const { submitBlog, history, formValues, file } = this.props;
     // submitBlog === a callback
-    submitBlog(formValues, file, history);
+    submitBlog(formValues, history, file);
   }
 
   render() {
