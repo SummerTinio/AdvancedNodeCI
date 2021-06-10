@@ -13,7 +13,7 @@ class BlogShow extends Component {
 
   renderImage() {
     //note: this.props.blog.imageUrl refers to the fileName!
-    if (this.props.blog.fileName !== null) {
+    if (this.props.blog.fileName) {
       const domain = 'https://evergreen-s3-blog-image-store.s3.ap-northeast-1.amazonaws.com/';
       return <img src={`${domain}${this.props.blog.fileName}`} alt={this.props.blog.title}/>
     }
