@@ -6,7 +6,9 @@ const requireLogin = require('../middlewares/requireLogin');
 
 const s3 = new AWS.S3({
     accessKeyId: keys.accessKeyId,
-    secretAccessKey: keys.secretAccessKey
+    secretAccessKey: keys.secretAccessKey,
+    signatureVersion: 'v4', //adding this made it work finally.
+    region: 'ap-northeast-1'
 })
 
 const upload = function routesForS3Upload (app) {
@@ -14,7 +16,7 @@ const upload = function routesForS3Upload (app) {
         // use slash in key to enforce "structure" through file names -- even if bucket is just a flat collection
         const extension = 'jpeg';
         // key === File Name for uploaded image
-        const fileName = `${req.user.id}/${uuid()}.${extension}`;
+        const fileName = `${req.user.id.trim()}/${uuid()}.${extension}`;
 
         // s3params === BCK!
         const s3params = {
